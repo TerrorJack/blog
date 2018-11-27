@@ -4,19 +4,15 @@ jobs:
   build:
     docker:
       - image: terrorjack/pixie:latest
-    environment:
-      - LC_CTYPE: en_US.UTF-8
-      - LOCALE_ARCHIVE: /root/.nix-profile/lib/locale/locale-archive
     steps:
       - run:
           name: Install dependencies
           command: |
-            nix-channel --add https://releases.nixos.org/nixpkgs/nixpkgs-19.03pre159614.f52b7f5c345 nixpkgs
+            nix-channel --add https://nixos.org/channels/nixpkgs-unstable
             nix-channel --update
             nix-env -u
             nix-env -iA \
               nixpkgs.gitMinimal \
-              nixpkgs.glibcLocales \
               nixpkgs.nodejs-10_x \
               nixpkgs.openssh \
               nixpkgs.yarn
