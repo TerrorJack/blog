@@ -8,6 +8,9 @@ main =
     match "images/*" $ do
       route idRoute
       compile copyFileCompiler
+    match "blobs/*" $ do
+      route idRoute
+      compile copyFileCompiler
     match "css/*" $ do
       route idRoute
       compile compressCssCompiler

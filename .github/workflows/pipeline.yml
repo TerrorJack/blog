@@ -1,0 +1,46 @@
+name: pipeline
+
+on:
+  - push
+  - pull_request
+
+jobs:
+
+  build:
+    name: build
+    runs-on: ubuntu-18.04
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+    steps:
+
+      - name: install-nix
+        uses: cachix/install-nix-action@v9
+
+      - name: setup-node-14
+        uses: actions/setup-node@v2.0.0
+        with:
+          node-version: 14.3.0
+
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: build
+        run: |
+          nix build --file blog.nix
+          result/bin/blog build
+
+      - name: deploy
+        run: |
+          npm install -g \
+            netlify-cli
+
+          if [ $GITHUB_REPOSITORY = "TerrorJack/blog" ]
+          then
+            if [ $(git rev-parse --abbrev-ref HEAD) = "master" ]
+            then
+              netlify deploy --dir=_site --message="$GITHUB_REF-$GITHUB_SHA" --prod
+            else
+              netlify deploy --dir=_site --message="$GITHUB_REF-$GITHUB_SHA"
+            fi
+          fi
